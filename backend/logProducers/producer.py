@@ -15,7 +15,7 @@ LOG_TOPICS = [
     "services",
 ]
 
-# Kafka
+# kafka
 producer = KafkaProducer(bootstrap_servers='localhost:9092')
 
 
