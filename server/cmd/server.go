@@ -1,14 +1,10 @@
 package main
 
 import (
-	"fmt"
+	// "fmt"
 	"time"
-
-	"github.com/elastic/go-elasticsearch/v8"
+	// "github.com/elastic/go-elasticsearch/v8"
 )
-
-// kafka configuration
-const kafkaBrokerHost = "localhost:9092"
 
 var topics = []string{"auth", "database", "email", "payment", "server", "services"}
 
@@ -25,16 +21,17 @@ type Log struct {
 }
 
 func main() {
-	esConfig := elasticsearch.Config{
-		Addresses: []string{"http://localhost:9200"},
-	}
+	go KafkaConsumer(topics)
+	// esConfig := elasticsearch.Config{
+	// 	Addresses: []string{"http://localhost:9200"},
+	// }
 
-	esClient, err := elasticsearch.NewClient(esConfig)
-	if err != nil {
-		fmt.Println("Error creating Elasticsearch client:", err)
-		return
-	}
+	// esClient, err := elasticsearch.NewClient(esConfig)
+	// if err != nil {
+	// 	fmt.Println("Error creating Elasticsearch client:", err)
+	// 	return
+	// }
 
-	fmt.Println("esClient:", esClient)
+	// fmt.Println("esClient:", esClient)
 
 }
