@@ -17,10 +17,11 @@
 ### Built With
 
 - Python
-- Node JS & NPM
-- Golang
+- Typescript
+- Go
 - Kafka
 - Elastic Search
+- NextJs
 
 <!-- GETTING STARTED -->
 
