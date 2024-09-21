@@ -22,6 +22,7 @@
 - Kafka
 - Elastic Search
 - NextJs
+- Docker
 
 <!-- GETTING STARTED -->
 
@@ -34,3 +35,28 @@
   ```sh
   git clone https://github.com/siAyush/ingestor.git
   ```
+
+- Run ingestor server
+
+  1. Go to `server` directory
+     ```sh
+       cd server
+     ```
+  2. Install golang dependencies
+     ```sh
+      go mod download
+     ```
+  3. Install Python dependencies
+     ```sh
+       pip install -r requirements.txt
+     ```
+  4. Start producing logs
+     ```sh
+      cd server/logProducers
+      ./runProducers.sh
+     ```
+  5. Start the ingestor server
+     ```sh
+      cd server/cmd
+      go run .
+     ```
