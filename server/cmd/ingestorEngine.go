@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 
 	"github.com/elastic/go-elasticsearch/v8/esapi"
+	"github.com/gin-gonic/gin"
 )
 
 const batchSize = 10
@@ -78,4 +80,20 @@ func processLogs(ctx context.Context, ingestionContext *IngestionContext, logs [
 	if res.IsError() {
 		fmt.Printf("Worker %d: Failed to index logs into elasticsearch: %s\n", workerID, res.String())
 	}
+}
+
+func AddLog(ctx *gin.Context, ingestionContext *IngestionContext) {
+	var log Log
+	if err := ctx.BindJSON(&log); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Bad Request"})
+		return
+	}
+
+	ingestionContext.logChannel <- log
+
+	response := gin.H{
+		"status": "success",
+	}
+
+	ctx.JSON(http.StatusAccepted, response)
 }

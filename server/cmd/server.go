@@ -52,6 +52,9 @@ func routes(ingestionContext *IngestionContext) *gin.Engine {
 	// number of logs
 	router.GET("/logs-count", func(ctx *gin.Context) { CountLogs(ctx, ingestionContext) })
 
+	// ingest logs
+	router.POST("/add-log", func(ctx *gin.Context) { AddLog(ctx, ingestionContext) })
+
 	return router
 }
 
