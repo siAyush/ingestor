@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -33,13 +33,24 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 
-export default function Component() {
+export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
-  const totalPages = 31;
-  const itemsPerPage = 100;
-  const totalItems = 3081;
+  const [logCount, setLogCount] = useState(0);
+  
+  const itemsPerPage = 20;
+  const totalItems = logCount;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  useEffect(() => {
+    async function fetchPosts() {
+      let res = await fetch("http://localhost:8000/logs-count");
+      let data = await res.json();
+      setLogCount(data.count);
+    }
+    fetchPosts();
+  }, []);
 
   const logData = [
     {
@@ -93,7 +104,10 @@ export default function Component() {
     <div className="flex flex-col h-screen bg-background">
       <header className="flex items-center justify-between px-6 py-4 border-b">
         <h1 className="text-2xl font-bold">Dashboard</h1>
-        {/* <Button>Export Logs</Button> */}
+        <div className="flex items-center space-x-4">
+          <span className="text-m font-bold">Total Logs: {logCount}</span>
+          {/* <Button>Export Logs</Button> */}
+        </div>
       </header>
       <main className="flex-1 overflow-auto p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

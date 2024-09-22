@@ -87,8 +87,8 @@ func main() {
 
 	// start server
 	router := routes(ingestionContext)
-	fmt.Println("starting server on :3000...")
-	if err := router.Run(":3000"); err != nil {
+	fmt.Println("starting server on :8000...")
+	if err := router.Run(":8000"); err != nil {
 		fmt.Println("error starting server:", err)
 	}
 
