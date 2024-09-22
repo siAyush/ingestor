@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,6 +34,7 @@ const topics = ["auth", "database", "email", "payment", "server", "services"];
 
 const AddLogModal: React.FC<AddLogModalProps> = ({ onLogAdded }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [canSubmit, setCanSubmit] = useState(false); // New state to track form validity
   const [newLog, setNewLog] = useState({
     level: "",
     message: "",
@@ -45,6 +46,15 @@ const AddLogModal: React.FC<AddLogModalProps> = ({ onLogAdded }) => {
     metadata: "",
     timestamp: null as Date | null,
   });
+
+  const validateForm = () => {
+    const { level, message, topic } = newLog;
+    setCanSubmit(level !== "" && message !== "" && topic !== "");
+  };
+
+  useEffect(() => {
+    validateForm();
+  }, [newLog]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -188,7 +198,9 @@ const AddLogModal: React.FC<AddLogModalProps> = ({ onLogAdded }) => {
               />
             </PopoverContent>
           </Popover>
-          <Button onClick={handleSubmitLog}>Submit Log</Button>
+          <Button onClick={handleSubmitLog} disabled={!canSubmit}>
+            Submit Log
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

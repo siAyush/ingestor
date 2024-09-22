@@ -34,7 +34,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { format } from "date-fns";
-import AddLogModal from "../components/AddLogModal ";
+import AddLogModal from "../components/AddLogModal";
 
 interface Log {
   _source: {
@@ -61,6 +61,7 @@ export default function Home() {
   const itemsPerPage = 20;
   const totalItems = logCount;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
+
   async function fetchLogCount() {
     try {
       const res = await axios.get("http://localhost:8000/logs-count");
