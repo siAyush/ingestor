@@ -55,6 +55,9 @@ func routes(ingestionContext *IngestionContext) *gin.Engine {
 	// ingest logs
 	router.POST("/add-log", func(ctx *gin.Context) { AddLog(ctx, ingestionContext) })
 
+	// fetch all logs
+	router.GET("/all-logs", func(ctx *gin.Context) { FetchAllLogs(ctx, ingestionContext) })
+
 	return router
 }
 

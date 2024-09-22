@@ -1,5 +1,6 @@
 "use client";
 
+import axios from "axios";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,72 +34,62 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 
+// Define the type for the log structure
+interface Log {
+  _source: {
+    topic: string;
+    resourceId: string;
+    traceId: string;
+    spanId: string;
+    commit: string;
+    timestamp: string;
+    metadata: Record<string, any>;
+  };
+}
+
 export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const [logCount, setLogCount] = useState(0);
-  
+  const [logData, setLogData] = useState<Log[]>([]); // Apply the Log type to the state
+
   const itemsPerPage = 20;
   const totalItems = logCount;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   useEffect(() => {
-    async function fetchPosts() {
-      let res = await fetch("http://localhost:8000/logs-count");
-      let data = await res.json();
-      setLogCount(data.count);
+    async function fetchLogCount() {
+      try {
+        const res = await axios.get("http://localhost:8000/logs-count");
+        setLogCount(res.data.count);
+      } catch (error) {
+        console.error("Error fetching log count:", error);
+      }
     }
-    fetchPosts();
+
+    fetchLogCount();
   }, []);
 
-  const logData = [
-    {
-      resourceId: "email-234567",
-      traceId: "vwx-yza-234",
-      spanId: "span-890",
-      commit: "1d2e3f4",
-      parentResourceId: "server-9876",
-      timestamp: "2023-09-15T14:00:00Z",
-      metadata: '"root": {...} 3 items',
-    },
-    {
-      resourceId: "email-2345",
-      traceId: "mno-pqr-789",
-      spanId: "span-654",
-      commit: "8b79ef0",
-      parentResourceId: "server-9876",
-      timestamp: "2023-09-15T08:45:00Z",
-      metadata: '"root": {...} 3 items',
-    },
-    {
-      resourceId: "email-23456",
-      traceId: "bcd-efg-345",
-      spanId: "span-901",
-      commit: "2d3e4f5",
-      parentResourceId: "server-5432",
-      timestamp: "2023-09-15T12:15:00Z",
-      metadata: '"root": {...} 3 items',
-    },
-    {
-      resourceId: "database-23456",
-      traceId: "pqr-stu-901",
-      spanId: "span-567",
-      commit: "5e6f7a8",
-      parentResourceId: "server-9876",
-      timestamp: "2023-09-15T11:45:00Z",
-      metadata: '"root": {...} 3 items',
-    },
-    {
-      resourceId: "database-456789",
-      traceId: "jkl-mno-789",
-      spanId: "span-234",
-      commit: "5e6f7a8",
-      parentResourceId: "server-5432",
-      timestamp: "2023-09-15T14:30:00Z",
-      metadata: '"root": {...} 3 items',
-    },
-  ];
+  useEffect(() => {
+    async function fetchLogs() {
+      try {
+        const res = await axios.get("http://localhost:8000/all-logs", {
+          params: {
+            page: currentPage,
+            size: itemsPerPage,
+            startDate: startDate ? startDate.toISOString() : undefined,
+            endDate: endDate ? endDate.toISOString() : undefined,
+          },
+        });
+        setLogData(res.data.logs); // Ensure response is typed as Log[]
+      } catch (error) {
+        console.error("Error fetching logs:", error);
+      }
+    }
+
+    fetchLogs();
+  }, [currentPage, startDate, endDate]);
 
   return (
     <div className="flex flex-col h-screen bg-background">
@@ -213,13 +204,11 @@ export default function Home() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="font-semibold">Topic</TableHead>
                 <TableHead className="font-semibold">Resource ID</TableHead>
                 <TableHead className="font-semibold">Trace ID</TableHead>
                 <TableHead className="font-semibold">Span ID</TableHead>
                 <TableHead className="font-semibold">Commit</TableHead>
-                <TableHead className="font-semibold">
-                  Parent resource ID
-                </TableHead>
                 <TableHead className="font-semibold">Timestamp</TableHead>
                 <TableHead className="font-semibold">Metadata</TableHead>
               </TableRow>
@@ -227,15 +216,15 @@ export default function Home() {
             <TableBody>
               {logData.map((log, index) => (
                 <TableRow key={index}>
+                  <TableCell>{log._source.topic}</TableCell>
                   <TableCell className="font-medium">
-                    {log.resourceId}
+                    {log._source.resourceId}
                   </TableCell>
-                  <TableCell>{log.traceId}</TableCell>
-                  <TableCell>{log.spanId}</TableCell>
-                  <TableCell>{log.commit}</TableCell>
-                  <TableCell>{log.parentResourceId}</TableCell>
-                  <TableCell>{log.timestamp}</TableCell>
-                  <TableCell>{log.metadata}</TableCell>
+                  <TableCell>{log._source.traceId}</TableCell>
+                  <TableCell>{log._source.spanId}</TableCell>
+                  <TableCell>{log._source.commit}</TableCell>
+                  <TableCell>{log._source.timestamp}</TableCell>
+                  <TableCell>{JSON.stringify(log._source.metadata)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
