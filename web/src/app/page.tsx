@@ -34,8 +34,8 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { format } from "date-fns";
+import AddLogModal from "../components/AddLogModal ";
 
-// Define the type for the log structure
 interface Log {
   _source: {
     topic: string;
@@ -44,6 +44,8 @@ interface Log {
     spanId: string;
     commit: string;
     timestamp: string;
+    message: string;
+    level: string;
     metadata: Record<string, any>;
   };
 }
@@ -59,17 +61,16 @@ export default function Home() {
   const itemsPerPage = 20;
   const totalItems = logCount;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
+  async function fetchLogCount() {
+    try {
+      const res = await axios.get("http://localhost:8000/logs-count");
+      setLogCount(res.data.count);
+    } catch (error) {
+      console.error("Error fetching log count:", error);
+    }
+  }
 
   useEffect(() => {
-    async function fetchLogCount() {
-      try {
-        const res = await axios.get("http://localhost:8000/logs-count");
-        setLogCount(res.data.count);
-      } catch (error) {
-        console.error("Error fetching log count:", error);
-      }
-    }
-
     fetchLogCount();
   }, []);
 
@@ -92,7 +93,11 @@ export default function Home() {
     }
 
     fetchLogs();
-  }, [currentPage, startDate, endDate, logLevel]); // Add logLevel to dependencies
+  }, [currentPage, startDate, endDate, logLevel]);
+
+  const handleLogAdded = () => {
+    fetchLogCount();
+  };
 
   return (
     <div className="flex flex-col h-screen bg-background">
@@ -101,8 +106,8 @@ export default function Home() {
         <h1 className="text-2xl font-bold ml-4">Dashboard</h1>
         <div className="flex-grow" />
         <div className="flex items-center space-x-4">
-          <span className="text-m font-bold">Total Logs: {logCount}</span>
           {/* <Button>Export Logs</Button> */}
+          <AddLogModal onLogAdded={handleLogAdded} />
         </div>
       </header>
 
@@ -211,9 +216,9 @@ export default function Home() {
             <TableHeader>
               <TableRow>
                 <TableHead className="font-semibold">Topic</TableHead>
+                <TableHead className="font-semibold">Message</TableHead>
+                <TableHead className="font-semibold">Level</TableHead>
                 <TableHead className="font-semibold">Resource ID</TableHead>
-                <TableHead className="font-semibold">Trace ID</TableHead>
-                <TableHead className="font-semibold">Span ID</TableHead>
                 <TableHead className="font-semibold">Commit</TableHead>
                 <TableHead className="font-semibold">Timestamp</TableHead>
                 <TableHead className="font-semibold">Metadata</TableHead>
@@ -223,11 +228,11 @@ export default function Home() {
               {logData.map((log, index) => (
                 <TableRow key={index}>
                   <TableCell>{log._source.topic}</TableCell>
+                  <TableCell>{log._source.message}</TableCell>
+                  <TableCell>{log._source.level}</TableCell>
                   <TableCell className="font-medium">
                     {log._source.resourceId}
                   </TableCell>
-                  <TableCell>{log._source.traceId}</TableCell>
-                  <TableCell>{log._source.spanId}</TableCell>
                   <TableCell>{log._source.commit}</TableCell>
                   <TableCell>{log._source.timestamp}</TableCell>
                   <TableCell>{JSON.stringify(log._source.metadata)}</TableCell>
@@ -238,6 +243,7 @@ export default function Home() {
         </div>
       </main>
       <footer className="border-t p-4">
+        <div className="text-m font-bold">Total Logs: {logCount}</div>
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
             {currentPage * itemsPerPage - itemsPerPage + 1} to{" "}
