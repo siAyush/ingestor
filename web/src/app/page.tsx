@@ -2,6 +2,7 @@
 
 import axios from "axios";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -52,7 +53,8 @@ export default function Home() {
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const [logCount, setLogCount] = useState(0);
-  const [logData, setLogData] = useState<Log[]>([]); // Apply the Log type to the state
+  const [logData, setLogData] = useState<Log[]>([]);
+  const [logLevel, setLogLevel] = useState<string>("all");
 
   const itemsPerPage = 20;
   const totalItems = logCount;
@@ -80,26 +82,30 @@ export default function Home() {
             size: itemsPerPage,
             startDate: startDate ? startDate.toISOString() : undefined,
             endDate: endDate ? endDate.toISOString() : undefined,
+            logLevel: logLevel !== "all" ? logLevel : undefined,
           },
         });
-        setLogData(res.data.logs); // Ensure response is typed as Log[]
+        setLogData(res.data.logs);
       } catch (error) {
         console.error("Error fetching logs:", error);
       }
     }
 
     fetchLogs();
-  }, [currentPage, startDate, endDate]);
+  }, [currentPage, startDate, endDate, logLevel]); // Add logLevel to dependencies
 
   return (
     <div className="flex flex-col h-screen bg-background">
-      <header className="flex items-center justify-between px-6 py-4 border-b">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
+      <header className="flex items-center px-6 py-4 border-b">
+        <Image src="/logIcon.png" alt="Logo" width={50} height={50} />
+        <h1 className="text-2xl font-bold ml-4">Dashboard</h1>
+        <div className="flex-grow" />
         <div className="flex items-center space-x-4">
           <span className="text-m font-bold">Total Logs: {logCount}</span>
           {/* <Button>Export Logs</Button> */}
         </div>
       </header>
+
       <main className="flex-1 overflow-auto p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Input placeholder="Search by any field :)" />
@@ -180,7 +186,7 @@ export default function Home() {
               <SelectItem value="all">All Trace IDs</SelectItem>
             </SelectContent>
           </Select>
-          <Select>
+          <Select onValueChange={setLogLevel}>
             <SelectTrigger>
               <SelectValue placeholder="Select log level" />
             </SelectTrigger>
