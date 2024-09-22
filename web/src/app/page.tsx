@@ -1,113 +1,284 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  CalendarIcon,
+} from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { format } from "date-fns";
+
+export default function Component() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [startDate, setStartDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>();
+  const totalPages = 31;
+  const itemsPerPage = 100;
+  const totalItems = 3081;
+
+  const logData = [
+    {
+      resourceId: "email-234567",
+      traceId: "vwx-yza-234",
+      spanId: "span-890",
+      commit: "1d2e3f4",
+      parentResourceId: "server-9876",
+      timestamp: "2023-09-15T14:00:00Z",
+      metadata: '"root": {...} 3 items',
+    },
+    {
+      resourceId: "email-2345",
+      traceId: "mno-pqr-789",
+      spanId: "span-654",
+      commit: "8b79ef0",
+      parentResourceId: "server-9876",
+      timestamp: "2023-09-15T08:45:00Z",
+      metadata: '"root": {...} 3 items',
+    },
+    {
+      resourceId: "email-23456",
+      traceId: "bcd-efg-345",
+      spanId: "span-901",
+      commit: "2d3e4f5",
+      parentResourceId: "server-5432",
+      timestamp: "2023-09-15T12:15:00Z",
+      metadata: '"root": {...} 3 items',
+    },
+    {
+      resourceId: "database-23456",
+      traceId: "pqr-stu-901",
+      spanId: "span-567",
+      commit: "5e6f7a8",
+      parentResourceId: "server-9876",
+      timestamp: "2023-09-15T11:45:00Z",
+      metadata: '"root": {...} 3 items',
+    },
+    {
+      resourceId: "database-456789",
+      traceId: "jkl-mno-789",
+      spanId: "span-234",
+      commit: "5e6f7a8",
+      parentResourceId: "server-5432",
+      timestamp: "2023-09-15T14:30:00Z",
+      metadata: '"root": {...} 3 items',
+    },
+  ];
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div className="flex flex-col h-screen bg-background">
+      <header className="flex items-center justify-between px-6 py-4 border-b">
+        <h1 className="text-2xl font-bold">Dashboard</h1>
+        {/* <Button>Export Logs</Button> */}
+      </header>
+      <main className="flex-1 overflow-auto p-6 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Input placeholder="Search by any field :)" />
+          <Input placeholder="Search using regex" />
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={`w-full justify-start text-left font-normal ${
+                  !startDate && "text-muted-foreground"
+                }`}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {startDate ? format(startDate, "PPP") : <span>Start date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Calendar
+                mode="single"
+                selected={startDate}
+                onSelect={setStartDate}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={`w-full justify-start text-left font-normal ${
+                  !endDate && "text-muted-foreground"
+                }`}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {endDate ? format(endDate, "PPP") : <span>End date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0">
+              <Calendar
+                mode="single"
+                selected={endDate}
+                onSelect={setEndDate}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
         </div>
-      </div>
-
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+          <Select>
+            <SelectTrigger>
+              <SelectValue placeholder="Filter by commit" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All commits</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select>
+            <SelectTrigger>
+              <SelectValue placeholder="Filter by span id" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All span ids</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select>
+            <SelectTrigger>
+              <SelectValue placeholder="Filter by Resource ID" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Resource IDs</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select>
+            <SelectTrigger>
+              <SelectValue placeholder="Filter by Trace ID" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Trace IDs</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select>
+            <SelectTrigger>
+              <SelectValue placeholder="Select log level" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All levels</SelectItem>
+              <SelectItem value="info">Info</SelectItem>
+              <SelectItem value="warn">Warn</SelectItem>
+              <SelectItem value="error">Error</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select>
+            <SelectTrigger>
+              <SelectValue placeholder="Filter by Message" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All messages</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="font-semibold">Resource ID</TableHead>
+                <TableHead className="font-semibold">Trace ID</TableHead>
+                <TableHead className="font-semibold">Span ID</TableHead>
+                <TableHead className="font-semibold">Commit</TableHead>
+                <TableHead className="font-semibold">
+                  Parent resource ID
+                </TableHead>
+                <TableHead className="font-semibold">Timestamp</TableHead>
+                <TableHead className="font-semibold">Metadata</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {logData.map((log, index) => (
+                <TableRow key={index}>
+                  <TableCell className="font-medium">
+                    {log.resourceId}
+                  </TableCell>
+                  <TableCell>{log.traceId}</TableCell>
+                  <TableCell>{log.spanId}</TableCell>
+                  <TableCell>{log.commit}</TableCell>
+                  <TableCell>{log.parentResourceId}</TableCell>
+                  <TableCell>{log.timestamp}</TableCell>
+                  <TableCell>{log.metadata}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </main>
+      <footer className="border-t p-4">
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
+            {currentPage * itemsPerPage - itemsPerPage + 1} to{" "}
+            {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems}
+          </div>
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setCurrentPage(1)}
+              disabled={currentPage === 1}
+            >
+              <span className="sr-only">Go to first page</span>
+              <ChevronsLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              <span className="sr-only">Go to previous page</span>
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <span className="text-sm font-medium">
+              Page {currentPage} of {totalPages}
             </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+            >
+              <span className="sr-only">Go to next page</span>
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setCurrentPage(totalPages)}
+              disabled={currentPage === totalPages}
+            >
+              <span className="sr-only">Go to last page</span>
+              <ChevronsRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      </footer>
+    </div>
   );
 }
