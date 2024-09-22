@@ -23,6 +23,7 @@
 - Elastic Search
 - NextJs
 - Docker
+- Kibana
 
 <!-- GETTING STARTED -->
 
