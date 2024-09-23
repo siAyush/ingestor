@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import AddLogModal from "../components/AddLogModal";
-import ReactJson from "@microlink/react-json-view"; // Import ReactJson
+import ReactJson from "@microlink/react-json-view";
 
 interface Log {
   _source: {
