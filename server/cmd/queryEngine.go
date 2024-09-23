@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 	"github.com/gin-gonic/gin"
@@ -49,10 +51,87 @@ func CountLogs(ctx *gin.Context, ingestionContext *IngestionContext) {
 }
 
 func FetchAllLogs(ctx *gin.Context, ingestionContext *IngestionContext) {
-	// Create a search request to fetch all logs (size can be limited to avoid huge responses)
+	// Extract query parameters
+	page := ctx.DefaultQuery("page", "1")        // Get current page
+	size := ctx.DefaultQuery("size", "20")       // Get size per page
+	logLevel := ctx.DefaultQuery("logLevel", "") // Get logLevel, default is empty (i.e., no filter)
+	startDate := ctx.Query("startDate")          // Optionally get startDate filter
+	endDate := ctx.Query("endDate")              // Optionally get endDate filter
+
+	// Convert page and size to integers
+	pageInt, err := strconv.Atoi(page)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid page value"})
+		return
+	}
+
+	sizeInt, err := strconv.Atoi(size)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid size value"})
+		return
+	}
+
+	// Prepare Elasticsearch query with optional filters
+	query := map[string]interface{}{
+		"from": (pageInt - 1) * sizeInt,
+		"size": sizeInt,
+		"query": map[string]interface{}{
+			"bool": map[string]interface{}{
+				"must": []interface{}{},
+			},
+		},
+	}
+
+	// Add logLevel filter if provided
+	if logLevel != "" && logLevel != "all" {
+		query["query"].(map[string]interface{})["bool"].(map[string]interface{})["must"] = append(
+			query["query"].(map[string]interface{})["bool"].(map[string]interface{})["must"].([]interface{}),
+			map[string]interface{}{
+				"match": map[string]interface{}{
+					"level": logLevel,
+				},
+			},
+		)
+	}
+
+	// Add startDate and endDate filters if provided
+	if startDate != "" {
+		query["query"].(map[string]interface{})["bool"].(map[string]interface{})["must"] = append(
+			query["query"].(map[string]interface{})["bool"].(map[string]interface{})["must"].([]interface{}),
+			map[string]interface{}{
+				"range": map[string]interface{}{
+					"timestamp": map[string]interface{}{
+						"gte": startDate,
+					},
+				},
+			},
+		)
+	}
+	if endDate != "" {
+		query["query"].(map[string]interface{})["bool"].(map[string]interface{})["must"] = append(
+			query["query"].(map[string]interface{})["bool"].(map[string]interface{})["must"].([]interface{}),
+			map[string]interface{}{
+				"range": map[string]interface{}{
+					"timestamp": map[string]interface{}{
+						"lte": endDate,
+					},
+				},
+			},
+		)
+	}
+
+	// Marshal the query into JSON
+	queryBytes, err := json.Marshal(query)
+	if err != nil {
+		fmt.Println("Error marshalling Elasticsearch query:", err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Internal Server Error"})
+		return
+	}
+
+	// Create a search request with the JSON body
 	searchReq := esapi.SearchRequest{
 		Index: []string{ingestionContext.indexName},
-		Size:  esapi.IntPtr(100), // Adjust size as needed or paginate for large datasets
+		Body:  bytes.NewReader(queryBytes),
 	}
 
 	// Execute the search request
