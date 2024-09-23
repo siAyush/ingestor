@@ -103,6 +103,17 @@ export default function Home() {
     fetchLogs();
   };
 
+  const exportLogsToJson = () => {
+    const json = JSON.stringify(logData, null, 2);
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "logs.json";
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="flex flex-col h-screen bg-background">
       <header className="flex items-center px-6 py-4 border-b">
@@ -110,7 +121,7 @@ export default function Home() {
         <h1 className="text-2xl font-bold ml-4">Dashboard</h1>
         <div className="flex-grow" />
         <div className="flex items-center space-x-4">
-          {/* <Button>Export Logs</Button> */}
+          <Button onClick={exportLogsToJson}>Export Logs</Button>
           <AddLogModal onLogAdded={handleLogAdded} />
         </div>
       </header>
@@ -118,7 +129,6 @@ export default function Home() {
       <main className="flex-1 overflow-auto p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Input placeholder="Search by any field :)" />
-          <Input placeholder="Search using regex" />
           <Popover>
             <PopoverTrigger asChild>
               <Button
