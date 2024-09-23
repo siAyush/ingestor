@@ -71,33 +71,34 @@ export default function Home() {
     }
   }
 
+  async function fetchLogs() {
+    try {
+      const res = await axios.get("http://localhost:8000/all-logs", {
+        params: {
+          page: currentPage,
+          size: itemsPerPage,
+          startDate: startDate ? startDate.toISOString() : undefined,
+          endDate: endDate ? endDate.toISOString() : undefined,
+          logLevel: logLevel !== "all" ? logLevel : undefined,
+        },
+      });
+      setLogData(res.data.logs);
+    } catch (error) {
+      console.error("Error fetching logs:", error);
+    }
+  }
+
   useEffect(() => {
     fetchLogCount();
   }, []);
 
-  useEffect(() => {
-    async function fetchLogs() {
-      try {
-        const res = await axios.get("http://localhost:8000/all-logs", {
-          params: {
-            page: currentPage,
-            size: itemsPerPage,
-            startDate: startDate ? startDate.toISOString() : undefined,
-            endDate: endDate ? endDate.toISOString() : undefined,
-            logLevel: logLevel !== "all" ? logLevel : undefined,
-          },
-        });
-        setLogData(res.data.logs);
-      } catch (error) {
-        console.error("Error fetching logs:", error);
-      }
-    }
-
+  useEffect(() => {    
     fetchLogs();
   }, [currentPage, startDate, endDate, logLevel]);
 
   const handleLogAdded = () => {
     fetchLogCount();
+    fetchLogs();
   };
 
   return (
