@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import AddLogModal from "../components/AddLogModal";
+import ReactJson from "@microlink/react-json-view"; // Import ReactJson
 
 interface Log {
   _source: {
@@ -223,7 +224,13 @@ export default function Home() {
                   </TableCell>
                   <TableCell>{log._source.commit}</TableCell>
                   <TableCell>{log._source.timestamp}</TableCell>
-                  <TableCell>{JSON.stringify(log._source.metadata)}</TableCell>
+                  <TableCell>
+                    <ReactJson
+                      src={log._source.metadata}
+                      collapsed={true}
+                      enableClipboard={false}
+                    />
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
