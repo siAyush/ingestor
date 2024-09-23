@@ -21,9 +21,13 @@
 - Export logs in json
 - Add new logs via http
 
-## About The Project
+## Project Architecture & UI
 
+### System Design
 <img src="./assets/design.png" alt="Logo" >
+
+### Frontend
+<img src="./assets/frontend.png" alt="Logo" >
 
 ### Built With
 
