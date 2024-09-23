@@ -55,6 +55,7 @@ func FetchAllLogs(ctx *gin.Context, ingestionContext *IngestionContext) {
 	page := ctx.DefaultQuery("page", "1")        // Get current page
 	size := ctx.DefaultQuery("size", "20")       // Get size per page
 	logLevel := ctx.DefaultQuery("logLevel", "") // Get logLevel, default is empty (i.e., no filter)
+	topic := ctx.DefaultQuery("topic", "")       // Get topic, default is empty (i.e., no filter)
 	startDate := ctx.Query("startDate")          // Optionally get startDate filter
 	endDate := ctx.Query("endDate")              // Optionally get endDate filter
 
@@ -89,6 +90,18 @@ func FetchAllLogs(ctx *gin.Context, ingestionContext *IngestionContext) {
 			map[string]interface{}{
 				"match": map[string]interface{}{
 					"level": logLevel,
+				},
+			},
+		)
+	}
+
+	// Add topic filter if provided
+	if topic != "" && topic != "all" {
+		query["query"].(map[string]interface{})["bool"].(map[string]interface{})["must"] = append(
+			query["query"].(map[string]interface{})["bool"].(map[string]interface{})["must"].([]interface{}),
+			map[string]interface{}{
+				"match": map[string]interface{}{
+					"topic": topic,
 				},
 			},
 		)

@@ -57,6 +57,7 @@ export default function Home() {
   const [logCount, setLogCount] = useState(0);
   const [logData, setLogData] = useState<Log[]>([]);
   const [logLevel, setLogLevel] = useState<string>("all");
+  const [topic, setTopic] = useState<string>("all");
 
   const itemsPerPage = 20;
   const totalItems = logCount;
@@ -80,6 +81,7 @@ export default function Home() {
           startDate: startDate ? startDate.toISOString() : undefined,
           endDate: endDate ? endDate.toISOString() : undefined,
           logLevel: logLevel !== "all" ? logLevel : undefined,
+          topic: topic !== "all" ? topic : undefined,
         },
       });
       setLogData(res.data.logs);
@@ -92,9 +94,9 @@ export default function Home() {
     fetchLogCount();
   }, []);
 
-  useEffect(() => {    
+  useEffect(() => {
     fetchLogs();
-  }, [currentPage, startDate, endDate, logLevel]);
+  }, [currentPage, startDate, endDate, logLevel, topic]);
 
   const handleLogAdded = () => {
     fetchLogCount();
@@ -161,38 +163,21 @@ export default function Home() {
           </Popover>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-          <Select>
+          <Select onValueChange={setTopic}>
             <SelectTrigger>
-              <SelectValue placeholder="Filter by commit" />
+              <SelectValue placeholder="Select Topic" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All commits</SelectItem>
+              <SelectItem value="all">All Topics</SelectItem>
+              <SelectItem value="auth">Auth</SelectItem>
+              <SelectItem value="database">Database</SelectItem>
+              <SelectItem value="email">Email</SelectItem>
+              <SelectItem value="payment">Payment</SelectItem>
+              <SelectItem value="server">Server</SelectItem>
+              <SelectItem value="services">Services</SelectItem>
             </SelectContent>
           </Select>
-          <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by span id" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All span ids</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by Resource ID" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Resource IDs</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by Trace ID" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Trace IDs</SelectItem>
-            </SelectContent>
-          </Select>
+
           <Select onValueChange={setLogLevel}>
             <SelectTrigger>
               <SelectValue placeholder="Select log level" />
@@ -202,14 +187,6 @@ export default function Home() {
               <SelectItem value="info">Info</SelectItem>
               <SelectItem value="warn">Warn</SelectItem>
               <SelectItem value="error">Error</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select>
-            <SelectTrigger>
-              <SelectValue placeholder="Filter by Message" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All messages</SelectItem>
             </SelectContent>
           </Select>
         </div>
