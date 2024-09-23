@@ -50,7 +50,7 @@ func CountLogs(ctx *gin.Context, ingestionContext *IngestionContext) {
 	ctx.JSON(http.StatusOK, gin.H{"count": int(count)})
 }
 
-func FetchAllLogs(ctx *gin.Context, ingestionContext *IngestionContext) {
+func FetchLogsAndSearch(ctx *gin.Context, ingestionContext *IngestionContext) {
 	// Extract query parameters
 	page := ctx.DefaultQuery("page", "1")        // Get current page
 	size := ctx.DefaultQuery("size", "20")       // Get size per page
